@@ -2,73 +2,83 @@
 
 using namespace std;
 
-void Lista::dodajDoListy(char odKogoPrzelew[], char doKogoPrzelew[], int ile){
+ElemListy::ElemListy(){
+    for(int i=0; i<NAZWA; i++){
+        calyKlucz[i]='\0';
+    }
+    ile=0;
+    next=nullptr;
+}
+
+Lista::Lista(){
+    glowa=nullptr;
+}
+
+Tablica::Tablica(){
+    for(int i=0; i<ROZMIAR; i++){
+        tablica[i]=nullptr;
+    }
+}
+
+void Lista::dodajDoListy(char calyKlucz[], int ile){
     ElemListy *nowy = new ElemListy;
     for(int i=0; i<NAZWA; i++){
-        nowy->odKogo[i]=odKogoPrzelew[i];
-        nowy->doKogo[i]=doKogoPrzelew[i];
+        nowy->calyKlucz[i]=calyKlucz[i];
     }
     nowy->ile=ile;
     nowy->next=glowa;
     glowa=nowy;
 }
 
-int Tablica::haszuj(char odKogoPrzelew[], char doKogoPrzelew[]){
+int Tablica::haszuj(char calyKlucz[]){
     int wynik=0;
-    wynik+=(int)odKogoPrzelew[0];
-    if(odKogoPrzelew[1]!='\0'){
-        wynik+=odKogoPrzelew[1];
-    }
-    else
-        wynik+=(int)doKogoPrzelew[0];
+    wynik+=(int)calyKlucz[0];
+    wynik+=(int)calyKlucz[1];
     return wynik%ROZMIAR;
 }
 
-void Tablica::dodajDoTablicy(char odKogoPrzelew[], char doKogoPrzelew[], int ilePieniedzy){
-    int numer=haszuj(odKogoPrzelew, doKogoPrzelew);
+void Tablica::dodajDoTablicy(char calyKlucz[], int ilePieniedzy){
+    int numer=haszuj(calyKlucz);
     if(tablica[numer]==nullptr){
         tablica[numer] = new Lista;
     }
-    tablica[numer]->dodajDoListy(odKogoPrzelew, doKogoPrzelew, ilePieniedzy);
+    tablica[numer]->dodajDoListy(calyKlucz, ilePieniedzy);
 }
 
-void Tablica::wypiszLiczbe(char odKogoPrzelew[], char doKogoPrzelew[]){
-    int numerElementu = haszuj(odKogoPrzelew, doKogoPrzelew), wynik=0, i;
+void Tablica::wypiszLiczbe(char calyKlucz[]){
+    int numerElementu = haszuj(calyKlucz);
+    long long wynik=0;
     if(tablica[numerElementu]!=nullptr){
         ElemListy *tmp=tablica[numerElementu]->glowa;
         while(tmp!=nullptr){
-            bool test1=true, test2=true;
-            i=-1;
-            /*for(int i=0; i<NAZWA; i++){
-                if(tmp->odKogo[i]){
-                    if(tmp->odKogo[i]!=odKogoPrzelew[i]){
-                        test1=false;
-                    }
+            bool test1=true;
+            for(int i=0; tmp->calyKlucz[i]; i++){
+                if(tmp->calyKlucz[i]!=calyKlucz[i]){
+                    test1=false;
+                    break;
                 }
-                if(tmp->doKogo[i]){
-                    if(tmp->doKogo[i]!=doKogoPrzelew[i]){
-                        test2=false;
-                    }
-                }
-            }*/
-            do{
-                i++;
-                if(tmp->odKogo[i]){
-                    if(tmp->odKogo[i]!=odKogoPrzelew[i]){
-                        test1=false;
-                    }
-                }
-                if(tmp->doKogo[i]){
-                    if(tmp->doKogo[i]!=doKogoPrzelew[i]){
-                        test2=false;
-                    }
-                }
-            }while(tmp->odKogo[i]!='\0' && tmp->doKogo[i]!='\0');
-            if(test2 && test1){
+            }
+            if(test1){
                 wynik+=tmp->ile;
             }
             tmp=tmp->next;
         }
     }
     cout<<wynik<<endl;
+}
+
+void stworzKlucz(char odKogo[], char doKogo[], char calyKlucz[]){
+    for(int i=0, x=0, y=0; i<2*NAZWA; i++){
+        if(odKogo[x]!='\0'){
+            calyKlucz[i]=odKogo[x];
+            x++;
+        }
+        else if(doKogo[y]!='\0'){
+            calyKlucz[i]=doKogo[y];
+            y++;
+        }
+        else{
+            calyKlucz[i]='\0';
+        }
+    }
 }
